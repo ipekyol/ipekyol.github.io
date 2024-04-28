@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>İş Performans Botu</title>
+ 
+  <style>
+ 
+ body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2c3e50; /* Arka plan rengi */
+  color: #ecf0f1; /* Metin rengi */
+}
+
+#container {
+  width: 100%;
+  max-width: 400px;
+  background-color: #34495e; /* Konteyner arkaplan rengi */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.tab-buttons {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  background-color: #3498db; /* Düğme arkaplan rengi */
+  color: #ecf0f1; /* Düğme metin rengi */
+  border: 2px solid #0d3a58; /* Daha koyu çerçeve rengi */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.tab-button:hover {
+  background-color: #2980b9; /* Hafif tonlu bir mavi renk */
+  border-color: #0a2c42; /* Daha koyu tonlu çerçeve rengi */
+}
+
+.tab-content {
+  display: none;
+}
+
+.active-tab {
+  display: block;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #ecf0f1; /* Metin rengi */
+  text-align: center; /* Başlıkları ortala */
+}
+
+input {
+  width: calc(100%);
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  text-align: center; /* Giriş kutucuklarını ortala */
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #3498db; /* Düğme arkaplan rengi */
+  color: #ecf0f1; /* Düğme metin rengi */
+  border: 2px solid #0d3a58; /* Daha koyu çerçeve rengi */
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9; /* Hafif tonlu bir mavi renk */
+  border-color: #0a2c42; /* Daha koyu tonlu çerçeve rengi */
+}
+
+#calculator {
+  text-align: center;
+}
+
+#calc-display {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
+}
+
+.buttons button {
+  padding: 15px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buttons button:hover {
+  background-color: #3498db; /* Düğme arkaplan rengi */
+  color: #ecf0f1; /* Düğme metin rengi */
+}
+
+#result-display {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #ecf0f1; /* Metin rengi */
+}
+
+
+  </style>
+</head>
+<body>
+
+  <div id="container">
+    <div class="tab-buttons">
+      <button class="tab-button" onclick="showTab('operasyonTab')">Operasyon</button>
+      <button class="tab-button" onclick="showTab('hesapMakinesiTab')">Hesap Makinesi</button>
+      <button class="tab-button" onclick="showTab('saatlikHedefTab')">Saatlik Hedef</button>
+    </div>
+
+    <div id="operasyonTab" class="tab-content active-tab">
+      <div id="operasyonListesi"></div>
+      <div id="calismaDakikaContainer">
+        <hr>
+        <label for="calismaDakika">Çalışma Dakikası:</label>
+        <input type="number" id="calismaDakika" value="540">
+      </div>
+      <label for="mesaiCheckbox">Mesai:</label>
+      <input type="checkbox" id="mesaiCheckbox" onchange="toggleMesai()">
+      <hr>
+      <button onclick="operasyonEkle()">Operasyon Ekle</button>
+      <button onclick="performansHesapla()">Performansı Hesapla</button>
+      <button onclick="sifirla()">Sıfırla</button>
+      <p id="sonuc"></p>
+    </div>
+
+    <div id="hesapMakinesiTab" class="tab-content">
+      <div id="calculator">
+        <input type="text" id="calc-display" disabled>
+        <div class="buttons">
+          <button onclick="appendToDisplay('1')">1</button>
+          <button onclick="appendToDisplay('2')">2</button>
+          <button onclick="appendToDisplay('3')">3</button>
+          <button onclick="appendToDisplay('+')">+</button>
+
+          <button onclick="appendToDisplay('4')">4</button>
+          <button onclick="appendToDisplay('5')">5</button>
+          <button onclick="appendToDisplay('6')">6</button>
+          <button onclick="appendToDisplay('-')">-</button>
+
+          <button onclick="appendToDisplay('7')">7</button>
+          <button onclick="appendToDisplay('8')">8</button>
+          <button onclick="appendToDisplay('9')">9</button>
+          <button onclick="appendToDisplay('*')">*</button>
+
+          <button onclick="appendToDisplay('0')">0</button>
+          <button onclick="appendToDisplay('.')">.</button>
+          <button onclick="clearLastDigit()">←</button>
+          <button onclick="clearDisplay()">C</button>
+
+          <button onclick="appendToDisplay('/')">/</button>
+          <button onclick="calculateResult()">=</button>
+        </div>
+        <div id="result-display">
+          <p>Sonuç: <span id="calc-result"></span></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="saatlikHedefTab" class="tab-content">
+      <hr>
+      <div>
+        <label for="urunZamaniHedef">Ürün Zamanı:</label>
+        <input type="number" id="urunZamaniHedef" class="urunZamaniHedef">
+      </div>
+      <button onclick="hesaplaHedef()" class="urunKaldirButton">Hesapla</button>
+      <p id="hedefSonuc"></p>
+    </div>
+
+  </div>
+
+  <script>
+    let urunSayac = 1;
+    let urunSayacHedef = 1;
+    let currentInput = '';
+
+    function toggleMesai() {
+      const calismaDakikaInput = document.getElementById('calismaDakika');
+      const mesaiCheckbox = document.getElementById('mesaiCheckbox');
+
+      if (mesaiCheckbox.checked) {
+        calismaDakikaInput.value = parseInt(calismaDakikaInput.value) + 120;
+      } else {
+        calismaDakikaInput.value = parseInt(calismaDakikaInput.value) - 120;
+      }
+    }
+
+    function operasyonEkle() {
+      const operasyonListesiDiv = document.getElementById('operasyonListesi');
+
+      const operasyonDiv = document.createElement('div');
+      operasyonDiv.innerHTML = `
+        <div id="operasyon${urunSayac}">
+          <label for="operasyonAdeti${urunSayac}"> ${urunSayac}. Operasyon Adeti:</label>
+          <input type="number" id="operasyonAdeti${urunSayac}" class="operasyonAdeti">
+          <label for="operasyonZamani${urunSayac}">${urunSayac}. Operasyon Zamanı:</label>
+          <input type="number" id="operasyonZamani${urunSayac}" class="operasyonZamani">
+          <button onclick="operasyonKaldir(${urunSayac})">Kaldır</button>
+        </div>
+		`;
+
+      operasyonListesiDiv.appendChild(operasyonDiv);
+
+      urunSayac++;
+    }
+
+    function operasyonKaldir(operasyonId) {
+      const operasyonDiv = document.getElementById(`operasyon${operasyonId}`);
+      operasyonDiv.remove();
+    }
+
+    function performansHesapla() {
+      const calismaDakika = parseFloat(document.getElementById('calismaDakika').value);
+      let sonuc = 0;
+
+      const operasyonAdetleri = document.getElementsByClassName('operasyonAdeti');
+      const operasyonZamanlari = document.getElementsByClassName('operasyonZamani');
+
+      for (let i = 0; i < operasyonAdetleri.length; i++) {
+        const operasyonAdeti = parseFloat(operasyonAdetleri[i].value);
+        const operasyonZamani = parseFloat(operasyonZamanlari[i].value);
+
+        sonuc += operasyonAdeti * operasyonZamani;
+      }
+
+      const performansYuzde = (sonuc / calismaDakika).toFixed(2);
+
+      document.getElementById('sonuc').innerHTML = `Performans: ${performansYuzde}%`;
+    }
+
+    function sifirla() {
+      const onay = confirm("Tüm bilgileri sıfırlamak istediğinizden emin misiniz?");
+
+      if (onay) {
+        location.reload();
+      }
+    }
+
+    function appendToDisplay(value) {
+      currentInput += value;
+      document.getElementById('calc-display').value = currentInput;
+    }
+
+    function clearDisplay() {
+      currentInput = '';
+      document.getElementById('calc-display').value = '';
+      document.getElementById('calc-result').innerText = '';
+    }
+
+    function clearLastDigit() {
+      currentInput = currentInput.slice(0, -1);
+      document.getElementById('calc-display').value = currentInput;
+    }
+
+    function calculateResult() {
+      try {
+        const result = eval(currentInput);
+        document.getElementById('calc-result').innerText = result;
+        currentInput = result.toString();
+      } catch (error) {
+        document.getElementById('calc-result').innerText = 'Error';
+        currentInput = '';
+      }
+    }
+
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.classList.remove('active-tab'));
+
+      const selectedTab = document.getElementById(tabId);
+      selectedTab.classList.add('active-tab');
+    }
+
+    function hesaplaHedef() {
+      const operasyonZamani = parseFloat(document.getElementById('urunZamaniHedef').value);
+      const result = Math.round(6000 / operasyonZamani); // Ürün zamanına göre saatlik hedefi hesapla ve yuvarla
+      document.getElementById('hedefSonuc').innerHTML = `Saatlik Hedef: ${result} ürün yapmalısınız.`;
+    }
+  </script>
+</body>
+</html>
